@@ -1,0 +1,43 @@
+# Configs for describing chain metadata for use in Hyperlane deployments or apps
+# Consists of a map of chain names to metadata
+# Schema here: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/main/typescript/sdk/src/metadata/chainMetadataTypes.ts
+---
+sepolia:
+  # Required fields:
+  chainId: 11155111 # Number: Use EIP-155 for EVM chains
+  domainId: 11155111 # Number: Recommend matching chainId when possible
+  name: sepolia # String: Unique identifier for the chain, must match key above
+  protocol: ethereum # ProtocolType: Ethereum, Sealevel, etc.
+  rpcUrls: # Array: List of RPC configs
+    # Only http field is required
+    - http: https://1rpc.io/sepolia # String: HTTP URL of the RPC endpoint (preferably HTTPS)
+      # Others here are optional
+  # Optional fields, not required for Hyperlane deployments but useful for apps:
+  isTestnet: true # Boolean: Whether the chain is considered a testnet or a mainnet
+
+  nativeToken:
+    name: Eth # String
+    symbol: ETH # String
+    decimals: 18 # Number
+  displayName: Sepolia # String: Human-readable name of the chain
+  displayNameShort: Sepolia # String: A shorter human-readable name
+
+# zkevm:
+#   # Required fields:
+#   chainId: 1442 # Number: Use EIP-155 for EVM chains
+#   domainId: 1442 # Number: Recommend matching chainId when possible
+#   name: zkevm # String: Unique identifier for the chain, must match key above
+#   protocol: ethereum # ProtocolType: Ethereum, Sealevel, etc.
+#   rpcUrls: # Array: List of RPC configs
+#     # Only http field is required
+#     - http: https://rpc.public.zkevm-test.net # String: HTTP URL of the RPC endpoint (preferably HTTPS)
+#       # Others here are optional
+#   # Optional fields, not required for Hyperlane deployments but useful for apps:
+#   isTestnet: true # Boolean: Whether the chain is considered a testnet or a mainnet
+
+#   nativeToken:
+#     name: Eth # String
+#     symbol: ETH # String
+#     decimals: 18 # Number
+#   displayName: ZkEVM # String: Human-readable name of the chain
+#   displayNameShort: zkevm # String: A shorter human-readable name
