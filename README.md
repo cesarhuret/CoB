@@ -51,4 +51,12 @@ When this order is submitted to CoB, the contract first checks if the order can 
 
 Additionally, for cross chain swaps, CoB utilizes a custom router contract that we built to resolve asset pair prices through ENS & Chronicle. For example, when a user wants to perform a cross asset swap of ETH to USDC, the router will fetch the Chronicle pricing of this pair through ETHUSDC.cob.eth. The price fetched from Chronicle is then used for the exchange rate between the two assets.
 
+### Tech stack
+
+Hyperlane: CoB utilizes Hyperlane to pass the orders to and from the destination chains. Whenever a user submits an order, the order information is broadcasted to the appropriate chain to await a coincidence of bridging. Whenever a coincidence of bridging is found, the updated order information is passed back to the origin chain and the respective canonical assets are sent between users.
+
+Chronicle: CoB utilizes Chronicle to determine the exchange rate between assets for cross chain swaps. To ensure cross chain swaps between users remain as inexpensive and trustless as CoB’s standard cross chain transfers, Chronicle’s price feeds are used for the asset pricing, and thus swap rate. Additionally, we created a custom router for Chronicle that uses ENS to make using Chronicle more efficient for both us and any other protocol that would like to implement them.
+
+ENS: CoB utilizes ENS to streamline the process of retrieving the price data from Chronicle through using ENS’ subnames for the price feed addresses (ex. ETHUSDC.cob.eth is Chronicle’s ETH/USD price feed).
+
 ### Try it out
