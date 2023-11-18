@@ -1,0 +1,3 @@
+@hyperlane/v3/=lib/hyperlane-monorepo/solidity/contracts/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts
+@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts
