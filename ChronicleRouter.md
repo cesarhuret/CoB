@@ -1,4 +1,4 @@
-# ChronicleRouter & ENS
+# ChronicleRouter
 
 ChronicleRouter is a custom router that uses ENS to make using Chronicle easier for both us and any other protocol that would like to implement Chronicle price feeds.
 
