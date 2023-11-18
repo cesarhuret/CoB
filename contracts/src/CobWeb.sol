@@ -183,17 +183,15 @@ contract CobWeb is IMessageRecipient {
     }
 
     function _broadcast(Order[] memory orders) private returns (bytes32) {
-        bytes32 messageId = IMailbox(_mailbox).dispatch(
+        uint256 quote = IMailbox(_mailbox).quoteDispatch(
             orders[0].toChain,
             _addressToBytes32(address(this)),
             bytes(abi.encode(orders))
         );
-
-        igp.payForGas{value: msg.value}(
-            messageId, // The ID of the message that was just dispatched
-            orders[0].toChain, // The destination domain of the message
-            200000, // 100k gas to use in the recipient's handle function
-            msg.sender // refunds go to msg.sender, who paid the msg.value
+        bytes32 messageId = IMailbox(_mailbox).dispatch{value: quote}(
+            orders[0].toChain,
+            _addressToBytes32(address(this)),
+            bytes(abi.encode(orders))
         );
 
         return messageId;
