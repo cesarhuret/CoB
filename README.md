@@ -62,11 +62,18 @@ Chronicle: CoB utilizes Chronicle to determine the exchange rate between assets 
 ENS: CoB utilizes ENS to streamline the process of retrieving the price data from Chronicle through using ENS’ subnames for the price feed addresses (ex. ETHUSDC.cob.eth is Chronicle’s ETH/USD price feed).
 
 ### Try it out
-Frontend: 
 
-Deployments:
-- Ethereum Sepolia: 
-- Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x702970e555471bB77036bC95D9f0e7131A01eDf6
+Frontend: http://cob.fi/
+
+ChronicleRouter Deployments: 
+
+- Ethereum Sepolia: https://sepolia.etherscan.io/address/0xd6c0AE992817AEd819777f960052eCAf4B90296c
+- Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x6e2542500d630b07d749c0a9d0c8cdf4e3359ccb
+
+CoB Deployments:
+
+- Ethereum Sepolia: https://sepolia.etherscan.io/address/0xE14c8eAAB11FC37fd5b52C4D1f878c4Bf5EAF628
+- Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x5156317aa1DF744b6291b0C4C08D0Dd3275589dC
 - Arbitrum Goerli: https://testnet.arbiscan.io/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
 - Base Goerli: https://goerli.basescan.org/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
 - Scroll Sepolia: https://sepolia.scrollscan.dev/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
