@@ -63,8 +63,9 @@ ENS: CoB utilizes ENS to streamline the process of retrieving the price data fro
 
 ### Try it out
 Frontend: 
-Ethereum Sepolia: 
-Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x702970e555471bB77036bC95D9f0e7131A01eDf6
-Arbitrum Goerli: https://testnet.arbiscan.io/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
-Base Goerli: https://goerli.basescan.org/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
-Scroll Sepolia: https://sepolia.scrollscan.dev/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
+Deployments:
+- Ethereum Sepolia: 
+- Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x702970e555471bB77036bC95D9f0e7131A01eDf6
+- Arbitrum Goerli: https://testnet.arbiscan.io/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
+- Base Goerli: https://goerli.basescan.org/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
+- Scroll Sepolia: https://sepolia.scrollscan.dev/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
