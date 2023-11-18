@@ -71,7 +71,6 @@ contract CobWeb is IMessageRecipient {
     function bridge(
         uint256 sourceId,
         uint256 amountIn,
-        uint256 amountOut,
         address fromToken,
         address toToken,
         uint32 fromChain,
@@ -83,7 +82,7 @@ contract CobWeb is IMessageRecipient {
             sourceId,
             msg.sender,
             amountIn,
-            amountOut,
+            amountIn,
             fromToken,
             toToken,
             fromChain,
@@ -101,8 +100,6 @@ contract CobWeb is IMessageRecipient {
         if (order.fromToken != order.toToken) {
             // oracle provided rate
             order.amountOut = (fromPrice * order.amountIn) / toPrice;
-        } else {
-            order.amountOut = order.amountIn;
         }
 
         for (uint256 k = 0; k < chains.length; k++) {
