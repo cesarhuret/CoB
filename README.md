@@ -46,5 +46,7 @@ In the core of an order there are several components:
     - Array of addresses that filled the order
 - fills
     - Mapping of addresses that filled the order to amount they filled
+ 
+When this order is submitted to CoB, the contract first checks if the order can be filled against existing pending orders. If yes, the order will attempt to fill as many orders as it can, with the filled order tokens sent to the respective parties on their respective chains. After this is complete, or in the case where there were no pending orders available, a message is broadcasted to the destination chain where they become additional pending orders.
 
 ### Try it out
