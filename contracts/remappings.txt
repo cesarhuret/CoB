@@ -3,3 +3,5 @@
 @openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts
 @chronicle/contracts/=lib/chronicle-std/src
 @ens/contracts/=lib/ens-contracts/contracts
+@ensdomains/ens-contracts/=lib/ens-contracts/
+@ensdomains/buffer/=lib/buffer/

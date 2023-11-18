@@ -6,7 +6,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IChronicle} from "@chronicle/contracts/IChronicle.sol";
 import {Utils} from "./utils.sol";
 import {ISelfKisser} from "./ISelfKisser.sol";
-import {IInterchainGasPaymaster} from "@hyperlane/v3/interfaces/IInterchainGasPaymaster.sol";
 import {IMailbox} from "@hyperlane/v3/interfaces/IMailbox.sol";
 import {ChronicleRouter} from "./ChronicleRouter.sol";
 
@@ -35,28 +34,12 @@ contract CobWeb is IMessageRecipient {
 
     ChronicleRouter public router;
 
-    constructor(
-        address mailbox,
-        address selfKisser,
-        address _igp,
-        address[] memory _tokens,
-        address[] memory _oracles,
-        uint256[] memory _chains
-    ) {
-        require(_tokens.length == _oracles.length, "Length mismatch");
-
-        _mailbox = mailbox;
-        chains = _chains;
-        igp = IInterchainGasPaymaster(_igp);
-
-        for (uint256 i = 0; i < _oracles.length; i++) {
-            ISelfKisser(selfKisser).selfKiss(_oracles[i], address(this));
-        }
-    }
-
     address private immutable _mailbox;
 
-    IInterchainGasPaymaster private igp;
+    constructor(address mailbox, uint32[] memory _chains) {
+        _mailbox = mailbox;
+        chains = _chains;
+    }
 
     // for access control on handle implementations
     modifier onlyMailbox() {
@@ -72,8 +55,8 @@ contract CobWeb is IMessageRecipient {
         uint256 deadline,
         uint256 maxSlippage
     ) external {
-        address from = ChronicleRouter(router).getToken(tokens[0], fromChain);
-        address to = ChronicleRouter(router).getToken(tokens[1], toChain);
+        address from = router.getToken(tokens[0], fromChain);
+        address to = router.getToken(tokens[1], toChain);
 
         uint256[] memory prices = router.query(tokens);
 
@@ -208,9 +191,7 @@ contract CobWeb is IMessageRecipient {
             pendingIncomingOrders[orderSourceId].filled == false &&
             pendingIncomingOrders[orderSourceId].deadline > block.timestamp
         ) {
-            // we don't cob anymore and just bridge
-            // swap token with 1inch
-            // bridge with Hyperlane(?)
+            // TODO
         }
     }
 

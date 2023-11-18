@@ -8,8 +8,6 @@ import {IAddrResolver} from "@ens/contracts/resolvers/profiles/IAddrResolver.sol
 import {ISelfKisser} from "./ISelfKisser.sol";
 
 contract ChronicleRouter is Ownable {
-    string[] public ens; // ENS addresses, e.g. btc/usd.cob.eth, etc...
-
     mapping(uint32 => mapping(string => address)) public enstoken;
 
     address public selfKisser;
@@ -24,18 +22,23 @@ contract ChronicleRouter is Ownable {
 
     constructor(
         address _selfKisser,
-        string[] memory _ens,
         address _registry,
         uint32 _chainId,
         string memory _base,
-        string memory _swarm
+        string memory _swarm,
+        string[] memory pairs,
+        uint32[] memory chains,
+        address[] memory tokens,
+        address[] memory oracles
     ) {
         selfKisser = _selfKisser;
-        ens = _ens;
         registry = _registry;
         chainId = _chainId;
         base = _base;
         swarm = _swarm;
+
+        setTokens(pairs, chains, tokens);
+        selfKissAll(oracles);
     }
 
     function setBase(string memory _base) external onlyOwner {
@@ -63,17 +66,18 @@ contract ChronicleRouter is Ownable {
     }
 
     function setTokens(
-        string[] calldata pairs,
-        uint32[] calldata chains,
-        address[] calldata tokens
-    ) external onlyOwner {
+        string[] memory pairs,
+        uint32[] memory chains,
+        address[] memory tokens
+    ) public onlyOwner {
         require(
-            pairs.length == chains.length && pairs.length == tokens.length,
-            "Length mismatch"
+            pairs.length * chains.length == tokens.length,
+            "ChronicleRouter: invalid length"
         );
-
-        for (uint256 i = 0; i < pairs.length; i++) {
-            enstoken[chains[i]][pairs[i]] = tokens[i];
+        for (uint256 i = 0; i < chains.length; i++) {
+            for (uint256 j = 0; j < pairs.length; j++) {
+                enstoken[chains[i]][pairs[j]] = tokens[j + i * pairs.length];
+            }
         }
     }
 
@@ -106,6 +110,8 @@ contract ChronicleRouter is Ownable {
     function query(
         string[] calldata pairs
     ) external view returns (uint256[] memory prices) {
+        prices = new uint256[](pairs.length);
+
         for (uint256 i = 0; i < pairs.length; i++) {
             bytes32 node = namehash(pairs[i]);
             address resolver = ENS(registry).resolver(node);
@@ -119,12 +125,9 @@ contract ChronicleRouter is Ownable {
         ISelfKisser(selfKisser).selfKiss(_ens, msg.sender);
     }
 
-    function selfKissAll() external {
-        for (uint256 i = 0; i < ens.length; i++) {
-            ISelfKisser(selfKisser).selfKiss(
-                enstoken[chainId][ens[i]],
-                msg.sender
-            );
+    function selfKissAll(address[] memory oracles) private {
+        for (uint256 i = 0; i < oracles.length; i++) {
+            ISelfKisser(selfKisser).selfKiss(oracles[i], address(this));
         }
     }
 }
