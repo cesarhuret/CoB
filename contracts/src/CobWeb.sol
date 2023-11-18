@@ -4,11 +4,11 @@ pragma solidity ^0.8.20;
 import {IMessageRecipient} from "@hyperlane/v3/interfaces/IMessageRecipient.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IChronicle} from "@chronicle/contracts/IChronicle.sol";
-import {IChronicle} from "@chronicle/contracts/IChronicle.sol";
 import {Utils} from "./utils.sol";
 import {ISelfKisser} from "./ISelfKisser.sol";
 import {IInterchainGasPaymaster} from "@hyperlane/v3/interfaces/IInterchainGasPaymaster.sol";
 import {IMailbox} from "@hyperlane/v3/interfaces/IMailbox.sol";
+import {ChronicleRouter} from "./ChronicleRouter.sol";
 
 contract CobWeb is IMessageRecipient {
     using Utils for uint;
@@ -30,11 +30,10 @@ contract CobWeb is IMessageRecipient {
     }
 
     Order[] public pendingIncomingOrders;
-    Order[] private outgoing;
-
-    mapping(address => address) tokenToOracle;
 
     uint256[] public chains;
+
+    ChronicleRouter public router;
 
     constructor(
         address mailbox,
@@ -53,10 +52,6 @@ contract CobWeb is IMessageRecipient {
         for (uint256 i = 0; i < _oracles.length; i++) {
             ISelfKisser(selfKisser).selfKiss(_oracles[i], address(this));
         }
-
-        for (uint256 i = 0; i < _tokens.length; i++) {
-            tokenToOracle[_tokens[i]] = _oracles[i];
-        }
     }
 
     address private immutable _mailbox;
@@ -71,20 +66,30 @@ contract CobWeb is IMessageRecipient {
 
     function bridge(
         uint256 amountIn,
-        address fromToken,
-        address toToken,
+        string[] calldata tokens,
         uint32 fromChain,
         uint32 toChain,
         uint256 deadline,
         uint256 maxSlippage
     ) external {
+        address from = ChronicleRouter(router).getToken(tokens[0], fromChain);
+        address to = ChronicleRouter(router).getToken(tokens[1], toChain);
+
+        uint256[] memory prices = router.query(tokens);
+
+        uint256 amountOut = amountIn;
+
+        if (from != to) {
+            amountOut = (prices[0] * amountIn) / prices[1];
+        }
+
         Order memory order = Order(
             0,
             msg.sender,
             amountIn,
-            amountIn,
-            fromToken,
-            toToken,
+            amountOut,
+            from,
+            to,
             fromChain,
             toChain,
             deadline,
@@ -94,20 +99,12 @@ contract CobWeb is IMessageRecipient {
             new uint256[](0)
         );
 
-        uint256 fromPrice = IChronicle(tokenToOracle[order.fromToken]).read();
-        uint256 toPrice = IChronicle(tokenToOracle[order.toToken]).read();
-
-        if (order.fromToken != order.toToken) {
-            // oracle provided rate
-            order.amountOut = (fromPrice * order.amountIn) / toPrice;
-        }
-
         for (uint256 k = 0; k < chains.length; k++) {
             Order[] memory ordersToBroadcast;
 
             for (uint i = 0; i < pendingIncomingOrders.length; i++) {
                 uint256 newAmountOut = (pendingIncomingOrders[i].amountIn *
-                    fromPrice) / toPrice;
+                    prices[0]) / prices[1];
 
                 if ((pendingIncomingOrders[i].amountOut > newAmountOut)) {
                     uint256 slippage = pendingIncomingOrders[i].amountOut -
@@ -173,8 +170,6 @@ contract CobWeb is IMessageRecipient {
                 }
 
                 ordersToBroadcast[ordersToBroadcast.length] = order;
-
-                // broadcast orders
             }
             if (ordersToBroadcast.length > 0) {
                 _broadcast(ordersToBroadcast);

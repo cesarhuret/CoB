@@ -16,3 +16,6 @@
 [submodule "contracts/lib/chronicle-std"]
 	path = contracts/lib/chronicle-std
 	url = https://github.com/chronicleprotocol/chronicle-std
+[submodule "contracts/lib/ens-contracts"]
+	path = contracts/lib/ens-contracts
+	url = https://github.com/ensdomains/ens-contracts

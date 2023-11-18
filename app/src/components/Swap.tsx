@@ -13,13 +13,22 @@ import {
   Stack,
   Text,
   VStack,
+  keyframes,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { chains, deployments } from "../chains";
 import cobABI from "../abis/cobweb.json";
+import { motion } from "framer-motion";
 
 export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+  const animationKeyframes = keyframes`
+  0% { transform: scale(1) rotateX(0); border-radius: 20%; }
+  100% { transform: scale(1) rotateX(360deg); border-radius: 20%; }
+`;
+
+  const animation = `${animationKeyframes} 1.7s ease-in-out infinite`;
 
   const destinationChain: any = Object.values(chains).find(
     (c: any) => c.chainId != chain.chainId
@@ -30,10 +39,6 @@ export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
     destinationChain.rpcUrls[0]
   );
 
-  console.log(chain);
-
-  console.log(destinationChain.chainIdNumber);
-
   const [selectedToken1, setSelectedToken1] = useState<string>("usdc");
   const [token1, setToken1] = useState(0);
   const [token1Balance, setToken1Balance] = useState("");
@@ -41,9 +46,12 @@ export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
   const [token2, setToken2] = useState(0);
   const [token2Balance, setToken2Balance] = useState("");
 
+  const [spin, setSpin] = useState(false);
+
   const [signer, setSigner] = useState<any>();
 
   const switchChain = (selectedChain: string) => {
+    setSpin(true);
     window.ethereum
       .request({
         method: "wallet_switchEthereumChain",
@@ -55,6 +63,7 @@ export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
       })
       .then(() => {
         setChain(selectedChain);
+        setSpin(false);
       })
       .catch((error: any) => {
         if (error.code == 4902) {
@@ -72,8 +81,10 @@ export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
                   </Box>
                 ),
               });
+              setSpin(false);
             });
         }
+        setSpin(false);
       });
   };
 
@@ -214,6 +225,9 @@ export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
             _hover={{ bgColor: "#1a1a1a" }}
           >
             <Button
+              as={motion.div}
+              animation={spin ? animation : ""}
+              transition="0.5s linear"
               variant={"ghost"}
               _hover={{ bgColor: "transparent" }}
               size={"lg"}
