@@ -3,29 +3,29 @@ pragma solidity ^0.8.20;
 
 import {IMessageRecipient} from "@hyperlane/v3/interfaces/IMessageRecipient.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IChronicle} from "@chronicle/contracts/IChronicle.sol";
+// import {IChronicle} from "@chronicle/contracts/IChronicle.sol";
 import {Utils} from "./utils.sol";
 import {ISelfKisser} from "./ISelfKisser.sol";
 import {IMailbox} from "@hyperlane/v3/interfaces/IMailbox.sol";
-import {ChronicleRouter} from "./ChronicleRouter.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+// import {ChronicleRouter} from "./ChronicleRouter.sol";
+import {console2} from "forge-std/Script.sol";
 import {StandardHookMetadata} from "@hyperlane/v3/hooks/libs/StandardHookMetadata.sol";
-import {IInterchainGasPaymaster} from "@hyperlane/v3/interfaces/IInterchainGasPaymaster.sol";
 
-contract CobWeb is IMessageRecipient, Ownable {
+contract CobThread is IMessageRecipient {
     using Utils for uint;
 
     struct Order {
         uint256 sourceId;
         address sender;
-        uint256 amountIn;
-        uint256 amountOut;
+        // uint256 amountIn;
+        // uint256 amountOut;
+        uint256 amount;
         address fromToken;
         address toToken;
         uint32 fromChain;
         uint32 toChain;
         uint256 deadline;
-        uint256 maxSlippage;
+        // uint256 maxSlippage;
         bool filled;
         address[] fillers;
         uint256[] fills;
@@ -35,18 +35,24 @@ contract CobWeb is IMessageRecipient, Ownable {
 
     uint256[] public chains;
 
-    ChronicleRouter public router;
+    // ChronicleRouter public router;
+
+    mapping(address => address) public tokenMappings;
 
     address private immutable _mailbox;
 
-    address[] public cobWebs;
-
-    Order[] private _ordersToBroadcast;
-
-    constructor(address mailbox, address _router, uint32[] memory _chains) {
+    constructor(
+        address mailbox,
+        uint32[] memory _chains,
+        address[] memory _tokens,
+        address[] memory _other
+    ) {
         _mailbox = mailbox;
         chains = _chains;
-        router = ChronicleRouter(_router);
+        // router = ChronicleRouter(_router);
+        for (uint i = 0; i < _tokens.length; i++) {
+            tokenMappings[_tokens[i]] = _other[i];
+        }
     }
 
     // for access control on handle implementations
@@ -55,58 +61,77 @@ contract CobWeb is IMessageRecipient, Ownable {
         _;
     }
 
-    function setCobWebs(address[] memory _cobWebs) public onlyOwner {
-        cobWebs = _cobWebs;
+    function setAddressMapping(address key, address value) public {
+        tokenMappings[key] = value;
+    }
+
+    function getCorrespondingAddress(
+        address key
+    ) public view returns (address) {
+        return tokenMappings[key];
     }
 
     function bridge(
-        uint256 amountIn,
-        string[] calldata tokens,
+        uint256 amount,
+        // string[] calldata tokens,
+        address fromToken,
         uint32 fromChain,
         uint32 toChain,
-        uint256 deadline,
-        uint256 maxSlippage
+        uint256 deadline // uint256 maxSlippage
     ) external {
-        address from = router.getToken(tokens[0], fromChain);
-        address to = router.getToken(tokens[1], toChain);
+        // address from = router.getToken(tokens[0], fromChain);
+        // address to = router.getToken(tokens[1], toChain);
 
-        uint256[] memory prices = router.query(tokens);
+        // uint256[] memory prices = router.query(tokens);
 
-        uint256 amountOut = amountIn;
+        // uint256 amountOut = amountIn;
 
-        if (from != to) {
-            amountOut = (prices[0] * amountIn) / prices[1];
-        }
+        // console2.logUint(amountOut);
+        // console2.logUint(amountIn);
+
+        // if (from != to) {
+        //     amountOut = (prices[0] * amountIn) / prices[1];
+        // }
+        address from = fromToken;
+        address to = tokenMappings[from];
 
         Order memory order = Order(
             0,
             msg.sender,
-            amountIn,
-            amountOut,
+            // amountIn,
+            // amountOut,
+            amount,
             from,
             to,
             fromChain,
             toChain,
             deadline,
-            maxSlippage,
+            // maxSlippage,
             false,
             new address[](0),
             new uint256[](0)
         );
 
-        for (uint256 k = 0; k < chains.length; k++) {
-            for (uint i = 0; i < pendingIncomingOrders.length; i++) {
-                uint256 newAmountOut = (pendingIncomingOrders[i].amountIn *
-                    prices[0]) / prices[1];
+        console2.logAddress(order.toToken);
 
-                if ((pendingIncomingOrders[i].amountOut > newAmountOut)) {
-                    uint256 slippage = pendingIncomingOrders[i].amountOut -
-                        newAmountOut;
-                    if (slippage > pendingIncomingOrders[i].maxSlippage) {
-                        // we don't fill this order
-                        continue;
-                    }
-                }
+        for (uint256 k = 0; k < chains.length; k++) {
+            console2.logUint(order.toChain);
+            console2.logUint(chains[k]);
+
+            Order[] memory ordersToBroadcast;
+
+            for (uint i = 0; i < pendingIncomingOrders.length; i++) {
+                // uint256 newAmountOut = (pendingIncomingOrders[i].amountIn *
+                //     // prices[0]) / prices[1];
+
+                // if ((pendingIncomingOrders[i].amountOut > newAmountOut)) {
+                //     uint256 slippage = pendingIncomingOrders[i].amountOut -
+                //         newAmountOut;
+                //     if (slippage > pendingIncomingOrders[i].maxSlippage) {
+                //         // we don't fill this order
+                //         continue;
+                //     }
+                // }
 
                 if (
                     pendingIncomingOrders[i].fromToken == order.toToken &&
@@ -118,13 +143,8 @@ contract CobWeb is IMessageRecipient, Ownable {
                     pendingIncomingOrders[i].fromChain == chains[k]
                 ) {
                     uint256 deltaFilledIn = Utils.min(
-                        order.amountIn,
-                        pendingIncomingOrders[i].amountOut
-                    );
-
-                    uint256 deltaFilledOut = Utils.min(
-                        order.amountOut,
-                        pendingIncomingOrders[i].amountIn
+                        order.amount,
+                        pendingIncomingOrders[i].amount
                     );
 
                     // we fill whatever we can
@@ -134,70 +154,66 @@ contract CobWeb is IMessageRecipient, Ownable {
                         deltaFilledIn
                     );
 
-                    order.amountIn -= deltaFilledIn;
-                    order.amountOut -= deltaFilledOut;
+                    order.amount -= deltaFilledIn;
 
                     pendingIncomingOrders[i].fillers.push(msg.sender);
                     pendingIncomingOrders[i].fills.push(deltaFilledIn);
 
                     if (
-                        pendingIncomingOrders[i].amountIn == 0 &&
-                        pendingIncomingOrders[i].amountOut == 0
+                        // pendingIncomingOrders[i].amount == 0 &&
+                        pendingIncomingOrders[i].amount == 0
                     ) {
                         pendingIncomingOrders[i].filled = true;
-                        _ordersToBroadcast.push(pendingIncomingOrders[i]);
+                        ordersToBroadcast[
+                            ordersToBroadcast.length
+                        ] = pendingIncomingOrders[i];
                     }
                 }
             }
 
             if (order.toChain == chains[k]) {
-                if (!order.filled && order.amountIn != 0) {
+                if (!order.filled && order.amount != 0) {
                     // we transfer our pending origin to the contract
                     IERC20(order.fromToken).transferFrom(
                         msg.sender,
                         address(this),
-                        order.amountIn
+                        order.amount
                     );
                 }
 
-                _ordersToBroadcast.push(order);
+                ordersToBroadcast[ordersToBroadcast.length] = order;
             }
-            if (_ordersToBroadcast.length > 0) {
-                _broadcast(_ordersToBroadcast, cobWebs[k]);
+            if (ordersToBroadcast.length > 0) {
+                _broadcast(ordersToBroadcast);
             }
-        }
-
-        while (_ordersToBroadcast.length > 0) {
-            _ordersToBroadcast.pop();
         }
     }
 
-    function estimateOutput(
-        address from,
-        address to,
-        uint256 amountIn
-    ) public view returns (uint256) {
-        uint256 fromPrice = IChronicle(from).read();
-        uint256 toPrice = IChronicle(to).read();
+    // function estimateOutput(
+    //     address from,
+    //     address to,
+    //     uint256 amountIn
+    // ) public view returns (uint256) {
+    //     uint256 fromPrice = IChronicle(from).read();
+    //     uint256 toPrice = IChronicle(to).read();
 
-        return (fromPrice * amountIn) / toPrice;
-    }
+    //     return (fromPrice * amountIn) / toPrice;
+    // }
 
-    function _broadcast(
-        Order[] memory orders,
-        address recipient
-    ) private returns (bytes32) {
+    function _broadcast(Order[] memory orders) private returns (bytes32) {
         uint256 quote = IMailbox(_mailbox).quoteDispatch(
             orders[0].toChain,
-            _addressToBytes32(recipient),
+            _addressToBytes32(address(this)),
             bytes(abi.encode(orders)),
-            StandardHookMetadata.formatMetadata(10000000, msg.sender)
+            StandardHookMetadata.formatMetadata(1000000000, msg.sender)
         );
-        bytes32 messageId = IMailbox(_mailbox).dispatch{value: quote}(
+        bytes32 messageId = IMailbox(_mailbox).dispatch{
+            value: 1000000000000000000
+        }(
             orders[0].toChain,
-            _addressToBytes32(recipient),
+            _addressToBytes32(address(this)),
             bytes(abi.encode(orders)),
-            StandardHookMetadata.formatMetadata(10000000, msg.sender)
+            StandardHookMetadata.formatMetadata(1000000000, msg.sender)
         );
 
         return messageId;
@@ -216,7 +232,7 @@ contract CobWeb is IMessageRecipient, Ownable {
         );
 
         // Refund tokens to the user
-        IERC20(order.fromToken).transfer(order.sender, order.amountIn);
+        IERC20(order.fromToken).transfer(order.sender, order.amount);
 
         // Remove the expired order
         removePendingOrder(orderSourceId);
@@ -276,6 +292,4 @@ contract CobWeb is IMessageRecipient, Ownable {
     function _addressToBytes32(address _addr) internal pure returns (bytes32) {
         return bytes32(uint256(uint160(_addr)));
     }
-
-    receive() external payable {}
 }

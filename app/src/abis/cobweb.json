@@ -9,54 +9,48 @@
         },
         {
           "internalType": "address",
-          "name": "selfKisser",
+          "name": "_router",
           "type": "address"
         },
         {
-          "internalType": "address[]",
-          "name": "_tokens",
-          "type": "address[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "_oracles",
-          "type": "address[]"
-        },
-        {
-          "internalType": "uint256[]",
+          "internalType": "uint32[]",
           "name": "_chains",
-          "type": "uint256[]"
+          "type": "uint32[]"
         }
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
     {
+      "anonymous": false,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "sourceId",
-          "type": "uint256"
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
         },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
         {
           "internalType": "uint256",
           "name": "amountIn",
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
-          "name": "amountOut",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "fromToken",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "toToken",
-          "type": "address"
+          "internalType": "string[]",
+          "name": "tokens",
+          "type": "string[]"
         },
         {
           "internalType": "uint32",
@@ -107,12 +101,47 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "orderSourceId",
+          "name": "",
           "type": "uint256"
         }
       ],
-      "name": "defaultToBridge",
-      "outputs": [],
+      "name": "cobWebs",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        }
+      ],
+      "name": "estimateOutput",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
@@ -137,6 +166,19 @@
       "name": "handle",
       "outputs": [],
       "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -212,6 +254,19 @@
       "inputs": [
         {
           "internalType": "uint256",
+          "name": "orderSourceId",
+          "type": "uint256"
+        }
+      ],
+      "name": "refund",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
           "name": "sourceId",
           "type": "uint256"
         }
@@ -220,6 +275,56 @@
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "router",
+      "outputs": [
+        {
+          "internalType": "contract ChronicleRouter",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_cobWebs",
+          "type": "address[]"
+        }
+      ],
+      "name": "setCobWebs",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ],
   "bytecode": {

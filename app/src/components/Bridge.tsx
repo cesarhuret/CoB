@@ -18,6 +18,7 @@ import {
 import { ethers } from "ethers";
 import { chains, deployments } from "../chains";
 import cobABI from "../abis/cobweb.json";
+import router from "../abis/router.json";
 import { motion } from "framer-motion";
 
 export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
@@ -27,6 +28,8 @@ export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
   0% { transform: scale(1) rotateX(0); border-radius: 20%; }
   100% { transform: scale(1) rotateX(360deg); border-radius: 20%; }
 `;
+
+  console.log(chain);
 
   const animation = `${animationKeyframes} 1.7s ease-in-out infinite`;
 
@@ -129,11 +132,47 @@ export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
     if (selectedToken1 && selectedToken2) getBalance();
   }, [sourceDeployments, selectedToken1, selectedToken2, destinationChain]);
 
-  const estimateOutput = async () => {};
+  const estimateOutput = async () => {
+    const bridge = new ethers.Contract(
+      deployments[chain.chainIdNumber]["router"],
+      router.abi,
+      signer
+    );
+
+    const feeds: any = {
+      eth: "ethusd",
+      usdc: "usdcusd",
+    };
+
+    console.log(ethers.utils.parseUnits(token1.toString(), 18));
+
+    const res = await bridge.query([
+      feeds[selectedToken1.toLocaleLowerCase()],
+      feeds[selectedToken2.toLocaleLowerCase()],
+    ]);
+
+    setToken2(
+      parseFloat(
+        ethers.utils.formatUnits(
+          res[0]
+            .mul(ethers.utils.parseUnits(token1.toString(), 18))
+            .div(res[1])
+            .toString(),
+          18
+        )
+      )
+    );
+  };
+
+  useEffect(() => {
+    console.log(deployments);
+    if (deployments && token1 != 0) estimateOutput();
+    if (token1 == 0) setToken2(0);
+  }, [token1]);
 
   const swap = async () => {
     const bridge = new ethers.Contract(
-      deployments["bridge"],
+      deployments[chain.chainIdNumber]["bridge"],
       cobABI.abi,
       signer
     );
@@ -141,22 +180,27 @@ export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
     const amount = ethers.utils.parseUnits(token1.toString(), 18);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
-    const tx = await bridge.bridge(
-      // uint256 amountIn,
-      // address fromToken,
-      // address toToken,
-      // uint32 fromChain,
-      // uint32 toChain,
-      // uint256 deadline,
-      // uint256 maxSlippage
-      amount,
-      sourceDeployments[selectedToken1],
-      destinationDeployments[selectedToken2],
-      chain.chainIdNumber,
-      destinationChain.chainIdNumber,
-      deadline,
-      0.05
-    );
+    console.log(deadline);
+
+    const tx = await bridge
+      .bridge(
+        amount,
+        [
+          selectedToken1.toLocaleLowerCase() + "usd",
+          selectedToken2.toLocaleLowerCase() + "usd",
+        ],
+        chain.chainIdNumber,
+        destinationChain.chainIdNumber,
+        deadline,
+        amount.div(100)
+      )
+      .catch((e: any) => {
+        console.log(e);
+      });
+
+    const res = await tx?.wait();
+
+    console.log(res);
   };
 
   return (
@@ -210,7 +254,9 @@ export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
                   USDC
                 </option>
               </Select>
-              <Text fontSize={"12px"}>Max: {token1Balance}</Text>
+              <Text fontSize={"12px"}>
+                Max: {parseFloat(token1Balance).toFixed(2)}
+              </Text>
             </VStack>
           </HStack>
         </FormControl>
@@ -253,7 +299,7 @@ export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
               height={"3rem"}
               variant={"unstyled"}
               type="text"
-              value={token2}
+              value={token2.toFixed(3)}
               flex={3}
               isReadOnly
               color={"#b0b0b0"}
@@ -274,7 +320,9 @@ export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
                   USDC
                 </option>
               </Select>
-              <Text fontSize={"12px"}>Max: {token2Balance}</Text>
+              <Text fontSize={"12px"}>
+                Max: {parseFloat(token2Balance).toFixed(2)}
+              </Text>
             </VStack>
           </HStack>
         </FormControl>
