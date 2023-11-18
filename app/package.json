@@ -6,6 +6,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
+    "@fontsource/inter": "^5.0.15",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.0.1",
     "@testing-library/user-event": "^14.1.0",
@@ -13,6 +14,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.4",
+    "ethers": "5.7.2",
     "framer-motion": "^6.2.9",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -41,5 +43,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
