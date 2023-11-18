@@ -80,6 +80,8 @@ export const App = () => {
       });
   };
 
+  console.log(deployments[chain]);
+
   return (
     <Box bg={"#0c0c0c"} h={"100vh"}>
       {chain ? (
@@ -91,11 +93,12 @@ export const App = () => {
             setChain={setChain}
             toast={toast}
           />
-          {chains[chain] != null ? (
-            <Stack h={"93vh"} alignItems={"center"} justifyContent={"start"}>
-              <Box h={"10vh"} />
+          {chains[chain] ? (
+            <Stack h={"90vh"} alignItems={"center"} justifyContent={"center"}>
               <Swap
                 chain={chains[chain]}
+                setChain={setChain}
+                toast={toast}
                 sourceDeployments={deployments[chain]}
               />
             </Stack>

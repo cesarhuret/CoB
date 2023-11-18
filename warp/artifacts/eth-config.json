@@ -1,0 +1,10 @@
+{
+  "chainId": 11155111,
+  "name": "Ether",
+  "symbol": "ETH",
+  "decimals": 18,
+  "type": "collateral",
+  "address": "0x83F4CB0de9b89a4a623A7e96A79a99407Baa56Fd",
+  "hypCollateralAddress": "0xfc635fFf1A8eFA7bd89a43974a5B2e87BcE76006",
+  "isNft": false
+}

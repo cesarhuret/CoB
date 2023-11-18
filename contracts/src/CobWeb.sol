@@ -39,6 +39,7 @@ contract CobWeb is IMessageRecipient {
     constructor(
         address mailbox,
         address selfKisser,
+        address _igp,
         address[] memory _tokens,
         address[] memory _oracles,
         uint256[] memory _chains
@@ -47,6 +48,7 @@ contract CobWeb is IMessageRecipient {
 
         _mailbox = mailbox;
         chains = _chains;
+        igp = IInterchainGasPaymaster(_igp);
 
         for (uint256 i = 0; i < _oracles.length; i++) {
             ISelfKisser(selfKisser).selfKiss(_oracles[i], address(this));
@@ -57,10 +59,9 @@ contract CobWeb is IMessageRecipient {
         }
     }
 
-    address immutable _mailbox;
+    address private immutable _mailbox;
 
-    IInterchainGasPaymaster igp =
-        IInterchainGasPaymaster(0x8f9C3888bFC8a5B25AED115A82eCbb788b196d2a);
+    IInterchainGasPaymaster private igp;
 
     // for access control on handle implementations
     modifier onlyMailbox() {
@@ -69,7 +70,6 @@ contract CobWeb is IMessageRecipient {
     }
 
     function bridge(
-        uint256 sourceId,
         uint256 amountIn,
         address fromToken,
         address toToken,
@@ -79,7 +79,7 @@ contract CobWeb is IMessageRecipient {
         uint256 maxSlippage
     ) external {
         Order memory order = Order(
-            sourceId,
+            0,
             msg.sender,
             amountIn,
             amountIn,
@@ -180,6 +180,17 @@ contract CobWeb is IMessageRecipient {
                 _broadcast(ordersToBroadcast);
             }
         }
+    }
+
+    function estimateOutput(
+        address from,
+        address to,
+        uint256 amountIn
+    ) public view returns (uint256) {
+        uint256 fromPrice = IChronicle(from).read();
+        uint256 toPrice = IChronicle(to).read();
+
+        return (fromPrice * amountIn) / toPrice;
     }
 
     function _broadcast(Order[] memory orders) private returns (bytes32) {

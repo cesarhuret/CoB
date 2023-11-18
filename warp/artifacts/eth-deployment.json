@@ -1,0 +1,10 @@
+{
+  "sepolia": {
+    "router": "0xfc635fFf1A8eFA7bd89a43974a5B2e87BcE76006",
+    "tokenType": "collateral"
+  },
+  "polygonzkevmtestnet": {
+    "router": "0x68F6668b1211933a90B89f4dE0B445c0Ff3B2D1E",
+    "tokenType": "synthetic"
+  }
+}

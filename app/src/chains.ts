@@ -1,6 +1,7 @@
 export const chains: any = {
   "11155111": {
     chainId: "0xaa36a7",
+    chainIdNumber: "11155111",
     chainName: "Sepolia",
     rpcUrls: ["https://1rpc.io/sepolia"],
     nativeCurrency: {
@@ -11,6 +12,7 @@ export const chains: any = {
   },
   "1442": {
     chainId: "0x5a2",
+    chainIdNumber: "1442",
     chainName: "ZK EVM",
     rpcUrls: ["https://rpc.public.zkevm-test.net"],
     nativeCurrency: {
@@ -29,7 +31,7 @@ export const deployments: any = {
   },
   "1442": {
     bridge: "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
-    usdc: "0xD739ee77A41335d7f66AaA278a8bB228400d4Fc3",
-    eth: "0x6f65b20F7A27997D48EC65C513EACe762487205a",
+    usdc: "0xB2AF72FD9f205457C7640bF7A77291746453550d",
+    eth: "0x68F6668b1211933a90B89f4dE0B445c0Ff3B2D1E",
   },
 };

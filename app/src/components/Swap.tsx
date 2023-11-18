@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import {
+  AbsoluteCenter,
   Box,
   Button,
   FormControl,
   FormLabel,
   HStack,
   Heading,
+  Image,
   Input,
   Select,
   Stack,
@@ -14,11 +16,10 @@ import {
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { chains, deployments } from "../chains";
+import cobABI from "../abis/cobweb.json";
 
-export const Swap = ({ chain, sourceDeployments }: any) => {
+export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-  console.log(chain);
 
   const destinationChain: any = Object.values(chains).find(
     (c: any) => c.chainId != chain.chainId
@@ -29,14 +30,52 @@ export const Swap = ({ chain, sourceDeployments }: any) => {
     destinationChain.rpcUrls[0]
   );
 
-  const [selectedToken1, setSelectedToken1] = useState<string>("");
+  console.log(chain);
+
+  console.log(destinationChain.chainIdNumber);
+
+  const [selectedToken1, setSelectedToken1] = useState<string>("usdc");
   const [token1, setToken1] = useState(0);
   const [token1Balance, setToken1Balance] = useState("");
-  const [selectedToken2, setSelectedToken2] = useState<string>("");
+  const [selectedToken2, setSelectedToken2] = useState<string>("eth");
   const [token2, setToken2] = useState(0);
   const [token2Balance, setToken2Balance] = useState("");
 
   const [signer, setSigner] = useState<any>();
+
+  const switchChain = (selectedChain: string) => {
+    window.ethereum
+      .request({
+        method: "wallet_switchEthereumChain",
+        params: [
+          {
+            chainId: chains[selectedChain].chainId,
+          },
+        ],
+      })
+      .then(() => {
+        setChain(selectedChain);
+      })
+      .catch((error: any) => {
+        if (error.code == 4902) {
+          window.ethereum
+            .request({
+              method: "wallet_addEthereumChain",
+              params: [chains[selectedChain]],
+            })
+            .catch((error: any) => {
+              toast({
+                position: "top-right",
+                render: () => (
+                  <Box color="white" p={3} bg="#000" borderRadius={"lg"}>
+                    {error.message}
+                  </Box>
+                ),
+              });
+            });
+        }
+      });
+  };
 
   useEffect(() => {
     const getBalance = async () => {
@@ -44,6 +83,9 @@ export const Swap = ({ chain, sourceDeployments }: any) => {
         "function balanceOf(address account) external view returns (uint256)",
         "function decimals() external view returns (uint8)",
       ];
+
+      console.log(selectedToken1);
+      console.log(sourceDeployments[selectedToken1]);
 
       const token1 = new ethers.Contract(
         sourceDeployments[selectedToken1],
@@ -74,13 +116,37 @@ export const Swap = ({ chain, sourceDeployments }: any) => {
     };
 
     if (selectedToken1 && selectedToken2) getBalance();
-  }, [sourceDeployments, selectedToken1, destinationChain]);
+  }, [sourceDeployments, selectedToken1, selectedToken2, destinationChain]);
 
   const estimateOutput = async () => {};
 
-  const swap = () => {};
+  const swap = async () => {
+    const bridge = new ethers.Contract(
+      deployments["bridge"],
+      cobABI.abi,
+      signer
+    );
 
-  console.log(token1);
+    const amount = ethers.utils.parseUnits(token1.toString(), 18);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+
+    const tx = await bridge.bridge(
+      // uint256 amountIn,
+      // address fromToken,
+      // address toToken,
+      // uint32 fromChain,
+      // uint32 toChain,
+      // uint256 deadline,
+      // uint256 maxSlippage
+      amount,
+      sourceDeployments[selectedToken1],
+      destinationDeployments[selectedToken2],
+      chain.chainIdNumber,
+      destinationChain.chainIdNumber,
+      deadline,
+      0.05
+    );
+  };
 
   return (
     <Box
@@ -124,7 +190,6 @@ export const Swap = ({ chain, sourceDeployments }: any) => {
                 value={selectedToken1}
                 onChange={(e) => {
                   setSelectedToken1(e.target.value);
-                  setSelectedToken2(e.target.value == "usdc" ? "eth" : "usdc");
                 }}
               >
                 <option style={{ background: "#0c0c0c" }} value={"eth"}>
@@ -138,6 +203,26 @@ export const Swap = ({ chain, sourceDeployments }: any) => {
             </VStack>
           </HStack>
         </FormControl>
+        <AbsoluteCenter zIndex={1}>
+          <Box
+            borderRadius={"lg"}
+            borderColor={"#272727"}
+            borderWidth={"1px"}
+            bg={"#0c0c0c"}
+            px={1}
+            py={2}
+            _hover={{ bgColor: "#1a1a1a" }}
+          >
+            <Button
+              variant={"ghost"}
+              _hover={{ bgColor: "transparent" }}
+              size={"lg"}
+              onClick={() => switchChain(destinationChain.chainIdNumber)}
+            >
+              <Image src={"/bridge.svg"} h={"0.9rem"} />
+            </Button>
+          </Box>
+        </AbsoluteCenter>
         <FormControl
           id="token1"
           borderWidth={"0.1em"}
@@ -166,7 +251,6 @@ export const Swap = ({ chain, sourceDeployments }: any) => {
                 value={selectedToken2}
                 onChange={(e) => {
                   setSelectedToken2(e.target.value);
-                  setSelectedToken1(e.target.value == "usdc" ? "eth" : "usdc");
                 }}
               >
                 <option style={{ background: "#0c0c0c" }} value={"eth"}>

@@ -1,0 +1,19 @@
+# A config for a Warp Route deployment
+# Typically used with the 'hyperlane deploy warp' command
+#
+# Token Types:
+#   native
+#   collateral
+#   synthetic
+#   collateralUri
+#   syntheticUri
+#   fastCollateral
+#   fastSynthetic
+---
+base:
+  chainName: sepolia
+  type: collateral
+  address: "0x83F4CB0de9b89a4a623A7e96A79a99407Baa56Fd" # Required for collateral types
+  mailbox: "0xfFAEF09B3cd11D9b20d1a19bECca54EEC2884766" # Optional mailbox address route
+synthetics:
+  - chainName: polygonzkevmtestnet
