@@ -2,7 +2,7 @@
 
 ChronicleRouter is a custom router that uses ENS to make using Chronicle easier for both us and any other protocol that would like to implement Chronicle price feeds.
 
-![ChronicleRouter.png](ChronicleRouter%20&%20ENS%207093d2d1b4294dbaac9e510788796e2d/ChronicleRouter.png)
+![ChronicleRouter.png](./assets/ChronicleRouter.png)
 
 We sought to solve some inefficiencies we encountered when implementing Chronicle’s price feeds, mainly being 1) having the contract know what the appropriate price feed is to use, and 2) having the contract know what token address corresponds to what price feed.
 
@@ -18,3 +18,5 @@ In the ChronicleRouter contract, there are a few main public functions that othe
     1. Returns the token address for a given pair
 3. query()
     1. Returns the pricing information from the Chronicle oracle for a given pair
+  
+Utilizing ENS for this router also future proofs contract implementations using Chronicle, as if there are updates to the oracle contract addresses, the new addresses can be updated as the ENS resolved address.
