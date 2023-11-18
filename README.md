@@ -14,39 +14,41 @@ CoB can be utilized for both cross chain asset transfers and cross chain swaps t
 
 ![Alt text](./assets/CoBContractFlow.png)
 
-In the core of an order there are several components:
+At the core of an order there are several components:
 
 - sourceId
-  - ID of the order on the fromChain
+    - ID of the order on the  fromChain
 - sender
-  - address of msg.sender, will be the same address to receive on toChain
+    - address of msg.sender, will be the same address to receive on toChain
 - fromToken
-  - address of token the sender is sending
+    - address of token the sender is sending
 - toToken
-  - address of token the sender is receiving
+    - address of token the sender is receiving
 - amountIn
-  - uint256 of amount of tokens sender is bridging
+    - uint256 of amount of tokens sender is bridging
 - amountOut
-  - uint256 of amount of tokens sender is receiving
-  - IF fromToken = toToken
-    - amountOut = amountIn
-  - ELSE
-    - amountOut = oraclePrice(toToken/fromToken) \* amountIn
+    - uint256 of amount of tokens sender is receiving
+    - IF fromToken = toToken
+        - amountOut = amountIn
+    - ELSE
+        - amountOut = oraclePrice(toToken/fromToken) * amountIn
 - fromChain
-  - uint256 of chainId the sender is sending tokens from
+    - uint256 of chainId the sender is sending tokens from
 - toChain
-  - uint256 of chainId the sender is receiving tokens from
+    - uint256 of chainId the sender is receiving tokens from
 - deadline
-  - uint256 of block number the order should be filled by
+    - uint256 of block number the order should be filled by
 - maxSlippage
-  - uint256 of max delta between amountIn and amountOut acceptable else reverts
+    - uint256 of max delta between amountIn and amountOut acceptable else reverts
 - filled
-  - bool if an order is filled
+    - bool if an order is filled
 - fillers
-  - Array of addresses that filled the order
+    - Array of addresses that filled the order
 - fills
-  - Mapping of addresses that filled the order to amount they filled
+    - Mapping of addresses that filled the order to amount they filled
 
-When this order is submitted to CoB, the contract first checks if the order can be filled against existing pending orders. If yes, the order will attempt to fill as many orders as it can, with the filled order tokens sent to the respective parties on their respective chains. After this is complete, or in the case where there were no pending orders available, a message is broadcasted to the destination chain where they become additional pending orders.
+When this order is submitted to CoB, the contract first checks if the order can be filled against existing pending orders. If yes, the order will attempt to fill as many orders as it can, with the filled order tokens sent to the respective parties on their respective chains. After this is complete, or in the case where there were no pending orders available, a message is broadcasted to the destination chain using Hyperlane where they become a pending order until another coincidence of bridging is found.
+
+Additionally, for cross chain swaps, CoB utilizes a custom router contract that we built to resolve asset pair prices through ENS & Chronicle. For example, when a user wants to perform a cross asset swap of ETH to USDC, the router will fetch the Chronicle pricing of this pair through ETHUSDC.cob.eth. The price fetched from Chronicle is then used for the exchange rate between the two assets.
 
 ### Try it out
