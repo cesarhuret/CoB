@@ -15,7 +15,7 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
-import { Swap } from "./components/Swap";
+import { Bridge } from "./components/Bridge";
 import { Navbar } from "./components/Navbar";
 import { chains, deployments } from "./chains";
 import { ethers } from "ethers";
@@ -80,8 +80,6 @@ export const App = () => {
       });
   };
 
-  console.log(deployments[chain]);
-
   return (
     <Box bg={"#0c0c0c"} h={"100vh"}>
       {chain ? (
@@ -95,7 +93,7 @@ export const App = () => {
           />
           {chains[chain] ? (
             <Stack h={"90vh"} alignItems={"center"} justifyContent={"center"}>
-              <Swap
+              <Bridge
                 chain={chains[chain]}
                 setChain={setChain}
                 toast={toast}

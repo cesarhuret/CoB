@@ -13,7 +13,7 @@
 base:
   chainName: sepolia
   type: collateral
-  address: "0x83F4CB0de9b89a4a623A7e96A79a99407Baa56Fd" # Required for collateral types
+  address: "0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5" # Required for collateral types
   mailbox: "0xfFAEF09B3cd11D9b20d1a19bECca54EEC2884766" # Optional mailbox address route
 synthetics:
   - chainName: polygonzkevmtestnet

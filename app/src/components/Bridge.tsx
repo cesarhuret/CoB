@@ -20,7 +20,7 @@ import { chains, deployments } from "../chains";
 import cobABI from "../abis/cobweb.json";
 import { motion } from "framer-motion";
 
-export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
+export const Bridge = ({ chain, setChain, toast, sourceDeployments }: any) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
   const animationKeyframes = keyframes`
@@ -288,7 +288,7 @@ export const Swap = ({ chain, setChain, toast, sourceDeployments }: any) => {
           fontWeight={"medium"}
           isDisabled={token1 == 0 || token1 > parseFloat(token1Balance)}
         >
-          Swap
+          Bridge
         </Button>
       </Stack>
     </Box>

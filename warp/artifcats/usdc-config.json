@@ -1,0 +1,10 @@
+{
+  "chainId": 11155111,
+  "name": "USD Coin",
+  "symbol": "USDC",
+  "decimals": 18,
+  "type": "collateral",
+  "address": "0xD2C27C38BeCB7FEeb6b36D291F54f24238267837",
+  "hypCollateralAddress": "0x4EA8d0293a61F17A160D68369a1089a0E0e10f80",
+  "isNft": false
+}
