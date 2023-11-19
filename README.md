@@ -67,12 +67,12 @@ Frontend: http://cob.fi/
 
 ChronicleRouter Deployments: 
 
-- Ethereum Sepolia: https://sepolia.etherscan.io/address/0xd6c0AE992817AEd819777f960052eCAf4B90296c
+- Ethereum Sepolia: https://sepolia.etherscan.io/address/0x81AFCb6eE862f396e22E0e5dAA282c2fbB37f0Ef
 - Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x6e2542500d630b07d749c0a9d0c8cdf4e3359ccb
 
 CoB Deployments:
 
-- Ethereum Sepolia: https://sepolia.etherscan.io/address/0xE14c8eAAB11FC37fd5b52C4D1f878c4Bf5EAF628
+- Ethereum Sepolia: https://sepolia.etherscan.io/address/0x9b8ae4c3D7d3b0D2e5073c36aa27d4AFDF097A4D
 - Polygon zkEVM testnet: https://testnet-zkevm.polygonscan.com/address/0x5156317aa1DF744b6291b0C4C08D0Dd3275589dC
 - Arbitrum Goerli: https://testnet.arbiscan.io/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
 - Base Goerli: https://goerli.basescan.org/address/0xf88361c2b6ef95f83c1ce25f2119cf4493b14fd5
